@@ -1,0 +1,67 @@
+# Gaming-Industry-Sales-Analysis
+
+## Author
+
+**Fortune Akioya**
+
+## Overview
+
+This repository contains a Python-based data analysis project focused on understanding sales trends and patterns within the video game industry. Using a dataset (either synthetic or a real CSV), the project performs data loading, exploration, cleaning, basic statistical analysis, and generates various visualizations to provide insights into game sales across different dimensions like genre, platform, publisher, year of release, and geographical regions.
+
+The goal is to identify key drivers of success, popular categories, and market dynamics that shape the global gaming landscape.
+
+## Table of Contents
+
+-   [Features](#features)
+-   [Dataset](#dataset)
+-   [Installation](#installation)
+-   [Usage](#usage)
+-   [Analysis Highlights](#analysis-highlights)
+-   [Visualizations](#visualizations)
+-   [Repository Structure](#repository-structure)
+-   [Contributing](#contributing)
+-   [License](#license)
+
+## Features
+
+*   **Data Loading & Exploration:** Efficient loading of CSV datasets using `pandas`, initial inspection of data structure, types, and missing values.
+*   **Data Cleaning:** Strategies for handling missing data, including dropping critical nulls and imputing values for `Year_of_Release` and `Publisher`.
+*   **Basic Data Analysis:** Calculation of descriptive statistics, grouping and aggregation of sales data by categorical variables (Genre, Platform, Publisher, Year), and identification of top performers.
+*   **Visualizations:** A suite of plots to intuitively represent findings:
+    *   Total Global Sales by Genre (Bar Chart)
+    *   Total Global Sales by Platform (Bar Chart)
+    *   Top 10 Publishers by Global Sales (Bar Chart)
+    *   Global Sales Trend Over Years (Line Plot)
+    *   Proportion of Global Sales by Region (Pie Chart)
+    *   NA Sales vs EU Sales by Genre (Scatter Plot)
+*   **Findings & Observations:** A summary of insights derived from the analysis.
+
+## Dataset
+
+The analysis is demonstrated using a **synthetic dataset** generated within the script to ensure immediate runnability. This synthetic dataset mimics a typical video game sales record with columns such as:
+
+*   `Name`: Name of the video game.
+*   `Platform`: Gaming platform (e.g., PS4, Xbox One, PC, Switch).
+*   `Year_of_Release`: Year the game was released.
+*   `Genre`: Game genre (e.g., Action, Sports, Shooter).
+*   `Publisher`: Company that published the game.
+*   `NA_Sales`: Sales in North America (in millions).
+*   `EU_Sales`: Sales in Europe (in millions).
+*   `JP_Sales`: Sales in Japan (in millions).
+*   `Other_Sales`: Sales in other regions (in millions).
+*   `Global_Sales`: Total global sales (sum of regional sales).
+
+**To use your own dataset:**
+If you have a real video game sales CSV (e.g., `vgsales.csv`), you can easily adapt the script:
+1.  Comment out the "Data Generation" section in the `gaming_analysis.py` file (or the first cell of the Jupyter Notebook).
+2.  Uncomment and modify the `df = pd.read_csv('your_game_sales_data.csv')` line to point to your dataset.
+3.  Ensure your CSV has consistent column names or modify the script to match them. If 'Global\_Sales' is not present, the script can calculate it from regional sales.
+
+## Installation
+
+To run this analysis, you'll need Python installed on your system.
+Clone this repository to your local machine:
+
+```bash
+git clone https://github.com/your-github-username/Gaming-Industry-Sales-Analysis.git
+cd Gaming-Industry-Sales-Analysis
