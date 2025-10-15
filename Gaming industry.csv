@@ -1,0 +1,246 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Author: Fortune Akioya\n",
+    "\n",
+    "import pandas as pd\n",
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns\n",
+    "import numpy as np\n",
+    "\n",
+    "# --- Data Generation (for demonstration purposes) ---\n",
+    "# In a real scenario, you would load an existing CSV.\n",
+    "# This part generates a synthetic dataset resembling video game sales.\n",
+    "np.random.seed(42)\n",
+    "\n",
+    "data_size = 500\n",
+    "genres = ['Action', 'Sports', 'Shooter', 'Role-Playing', 'Racing', 'Platform', 'Strategy']\n",
+    "platforms = ['PS4', 'Xbox One', 'PC', 'Switch', 'PS3', 'Xbox 360', 'Wii']\n",
+    "publishers = ['Nintendo', 'Sony', 'Microsoft', 'EA', 'Activision', 'Ubisoft', 'Take-Two']\n",
+    "\n",
+    "data = {\n",
+    "    'Name': [f'Game {i+1}' for i in range(data_size)],\n",
+    "    'Platform': np.random.choice(platforms, data_size),\n",
+    "    'Year_of_Release': np.random.randint(2010, 2023, data_size),\n",
+    "    'Genre': np.random.choice(genres, data_size),\n",
+    "    'Publisher': np.random.choice(publishers, data_size),\n",
+    "    'NA_Sales': np.round(np.random.uniform(0.1, 5.0, data_size), 2),\n",
+    "    'EU_Sales': np.round(np.random.uniform(0.05, 3.5, data_size), 2),\n",
+    "    'JP_Sales': np.round(np.random.uniform(0.01, 2.0, data_size), 2),\n",
+    "    'Other_Sales': np.round(np.random.uniform(0.01, 1.5, data_size), 2),\n",
+    "}\n",
+    "df = pd.DataFrame(data)\n",
+    "df['Global_Sales'] = df[['NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales']].sum(axis=1)\n",
+    "\n",
+    "# Introduce some missing values for demonstration of cleaning\n",
+    "for col in ['Publisher', 'Year_of_Release', 'Global_Sales']:\n",
+    "    missing_indices = np.random.choice(df.index, size=int(data_size * 0.03), replace=False)\n",
+    "    df.loc[missing_indices, col] = np.nan\n",
+    "# --- End of Data Generation ---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Data Analysis: Gaming Industry Dataset\n",
+    "\n",
+    "### Task 1: Load and Explore the Dataset"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(\"\\nFirst 5 rows of the dataset:\")\n",
+    "display(df.head())\n",
+    "\n",
+    "print(\"\\nDataset Info (data types and non-null counts):\")\n",
+    "df.info()\n",
+    "\n",
+    "print(\"\\nMissing values in each column (before cleaning):\")\n",
+    "print(df.isnull().sum())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Data Cleaning\n",
+    "We'll handle missing values by dropping rows with missing `Global_Sales` (as it's central to analysis), filling `Year_of_Release` with its median, and `Publisher` with 'Unknown'."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Drop rows where 'Global_Sales' is missing, as it's central to our analysis.\n",
+    "df.dropna(subset=['Global_Sales'], inplace=True)\n",
+    "\n",
+    "# Fill missing 'Year_of_Release' with the median year\n",
+    "df['Year_of_Release'] = df['Year_of_Release'].fillna(df['Year_of_Release'].median()).astype(int)\n",
+    "\n",
+    "# Fill missing 'Publisher' with 'Unknown'\n",
+    "df['Publisher'].fillna('Unknown', inplace=True)\n",
+    "\n",
+    "print(\"\\nMissing values in each column (after cleaning):\")\n",
+    "print(df.isnull().sum())\n",
+    "print(\"\\nDataset cleaned. Missing values have been addressed.\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Task 2: Basic Data Analysis"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "print(\"\\nBasic statistics of numerical columns:\")\n",
+    "display(df.describe())\n",
+    "\n",
+    "print(\"\\nMean Global Sales by Genre:\")\n",
+    "display(df.groupby('Genre')['Global_Sales'].mean().sort_values(ascending=False))\n",
+    "\n",
+    "print(\"\\nMean Global Sales by Platform:\")\n",
+    "display(df.groupby('Platform')['Global_Sales'].mean().sort_values(ascending=False))\n",
+    "\n",
+    "print(\"\\nTop 10 Publishers by Total Global Sales:\")\n",
+    "display(df.groupby('Publisher')['Global_Sales'].sum().nlargest(10))\n",
+    "\n",
+    "print(\"\\nTotal Global Sales by Year:\")\n",
+    "display(df.groupby('Year_of_Release')['Global_Sales'].sum().sort_index())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Findings and Observations\n",
+    "\n",
+    "1.  The dataset contains information on game names, platforms, release years, genres, publishers, and sales figures across different regions.\n",
+    "2.  Missing values for 'Publisher', 'Year_of_Release', and 'Global_Sales' were handled by dropping rows with missing 'Global_Sales', filling 'Year_of_Release' with its median, and 'Publisher' with 'Unknown'.\n",
+    "3.  From basic statistics (df.describe()):\n",
+    "    *   'Global_Sales' has a wide range, indicating popular titles can achieve much higher sales.\n",
+    "    *   Regional sales (NA_Sales, EU_Sales, JP_Sales, Other_Sales) show different distributions, with NA generally having higher average sales than others.\n",
+    "4.  Grouping by 'Genre': Action and Shooter genres often show high average global sales, suggesting their consistent popularity.\n",
+    "5.  Grouping by 'Platform': Certain platforms (e.g., PS4, Switch, Xbox One in this synthetic data) might dominate global sales, reflecting current console generations or strong market presence.\n",
+    "6.  Grouping by 'Publisher': A few publishers tend to dominate the market in terms of total global sales, indicating strong brand loyalty, large development budgets, or successful franchises.\n",
+    "7.  Sales trends over 'Year_of_Release' can indicate periods of market growth, decline, or the impact of major console releases. (In this synthetic data, it might just show general activity across years.)\n",
+    "8.  There might be a strong correlation between NA_Sales and Global_Sales, as NA often contributes a significant portion of overall sales."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Task 3: Visualizations"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# 1. Total Global Sales by Genre\n",
+    "plt.figure(figsize=(12, 6))\n",
+    "df.groupby('Genre')['Global_Sales'].sum().sort_values(ascending=False).plot(kind='bar')\n",
+    "plt.title('Total Global Sales by Genre')\n",
+    "plt.xlabel('Genre')\n",
+    "plt.ylabel('Total Global Sales (in Millions)')\n",
+    "plt.xticks(rotation=45, ha='right')\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "` `\n",
+    "# 2. Total Global Sales by Platform\n",
+    "plt.figure(figsize=(12, 6))\n",
+    "df.groupby('Platform')['Global_Sales'].sum().sort_values(ascending=False).plot(kind='bar', color='skyblue')\n",
+    "plt.title('Total Global Sales by Platform')\n",
+    "plt.xlabel('Platform')\n",
+    "plt.ylabel('Total Global Sales (in Millions)')\n",
+    "plt.xticks(rotation=45, ha='right')\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "` `\n",
+    "# 3. Top 10 Publishers by Global Sales\n",
+    "plt.figure(figsize=(12, 6))\n",
+    "df.groupby('Publisher')['Global_Sales'].sum().nlargest(10).plot(kind='bar', color='lightcoral')\n",
+    "plt.title('Top 10 Publishers by Total Global Sales')\n",
+    "plt.xlabel('Publisher')\n",
+    "plt.ylabel('Total Global Sales (in Millions)')\n",
+    "plt.xticks(rotation=45, ha='right')\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "` `\n",
+    "# 4. Global Sales Trend Over Years\n",
+    "plt.figure(figsize=(12, 6))\n",
+    "df.groupby('Year_of_Release')['Global_Sales'].sum().plot(kind='line', marker='o', color='green')\n",
+    "plt.title('Global Sales Trend Over Years')\n",
+    "plt.xlabel('Year of Release')\n",
+    "plt.ylabel('Total Global Sales (in Millions)')\n",
+    "plt.grid(True)\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "` `\n",
+    "# 5. Sales Distribution Across Regions\n",
+    "sales_regions = df[['NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales']].sum()\n",
+    "plt.figure(figsize=(8, 8))\n",
+    "sales_regions.plot(kind='pie', autopct='%1.1f%%', startangle=90, colors=sns.color_palette('pastel'))\n",
+    "plt.title('Proportion of Global Sales by Region')\n",
+    "plt.ylabel('') # Hide the default 'Global_Sales' label\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "` `\n",
+    "# 6. Scatter plot of NA Sales vs EU Sales (to see correlation)\n",
+    "plt.figure(figsize=(10, 7))\n",
+    "sns.scatterplot(x='NA_Sales', y='EU_Sales', hue='Genre', data=df, alpha=0.7, s=100)\n",
+    "plt.title('NA Sales vs EU Sales by Genre')\n",
+    "plt.xlabel('North America Sales (in Millions)')\n",
+    "plt.ylabel('Europe Sales (in Millions)')\n",
+    "plt.grid(True)\n",
+    "plt.tight_layout()\n",
+    "plt.show()\n",
+    "` `\n",
+    "\n",
+    "print(\"\\nVisualizations generated. Please review the plots displayed in the notebook.\")\n",
+    "print(\"\\n--- End of Analysis ---\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
